@@ -5,27 +5,26 @@ export default class Flights extends Component {
 
   constructor(props) {
     super(props);
-    this.state ={
+    this.state = {
       flightArray: [],
-      mostStopsFlight : "",
-      mostDeparturesFromManchester : "",
-      uniqueFlightNumbersPerDay : "",
-      proportionOfBusinessClass : "",
-      longestFlight : ""
+      mostStopsFlight: "",
+      mostDeparturesFromManchester: "",
+      uniqueFlightNumbersPerDay: "",
+      proportionOfBusinessClass: "",
+      longestFlight: ""
     }
     this.handleStats = this.handleStats.bind(this);
   }
 
-  componentDidMount(){
-
+  componentDidMount() {
+    //Get all flights
     Request.getFlights()
-    .then(result => this.setState({flightArray : result}, () => {
-      this.handleStats()
-    }))
-
+      .then(result => this.setState({flightArray: result}, () => {
+        this.handleStats()
+      }))
   }
 
-  handleStats(){
+  handleStats() {
     let flights = this.state.flightArray;
 
     //Most Stops
@@ -35,125 +34,133 @@ export default class Flights extends Component {
     let manchesterDepartures = this.getAllDeparturesFromAirport(flights, "MAN");
     let manchesterDeparturesDates = this.mapByDate(manchesterDepartures);
     let busiestManchesterDepartureDate = this.getBusiestDepartureDate(manchesterDeparturesDates);
-    this.setState({mostDeparturesFromManchester : busiestManchesterDepartureDate});
+    this.setState({
+      mostDeparturesFromManchester: busiestManchesterDepartureDate
+    });
 
     //Different flight numbers per day
     let flightDates = this.differentFlightNumbersPerDay(flights);
-    this.setState({uniqueFlightNumbersPerDay : flightDates});
+    this.setState({
+      uniqueFlightNumbersPerDay: flightDates
+    });
 
     //Proportion of business class flights
     let businessClassProportion = this.calculateProportionOfBusinessClassFlights(flights);
-    this.setState({proportionOfBusinessClass : JSON.stringify(businessClassProportion)});
+    this.setState({
+      proportionOfBusinessClass: JSON.stringify(businessClassProportion)
+    });
 
-    this.setState({ longestFlight : this.calculateLongestFlight(flights)});
+    //Longest Flight
+    this.setState({
+      longestFlight: this.calculateLongestFlight(flights)
+    });
 
   }
 
-  convertTimeToHours(time){
+  convertTimeToHours(time) {
     var hours;
-
-    hours = parseFloat(time[0]) + parseFloat((time[1]/60));
-
-
+    hours = parseFloat(time[0]) + parseFloat((time[1] / 60));
     return parseFloat(hours).toFixed(2);
   }
 
-  calculateLongestFlight(flights){
+  calculateLongestFlight(flights) {
 
-      var maxTime = 0;
-      var longestFlight;
+    var maxTime = 0;
+    var longestFlight;
 
-      for(var i=0; i<flights.length; i++){
-        var flight = flights[i]._attributes;
+    for (var i = 0; i < flights.length; i++) {
+      var flight = flights[i]._attributes;
 
-        var departureTime = flight.outdeparttime;
-        var arrivalTime = flight.outarrivaltime;
+      var departureTime = flight.outdeparttime;
+      var arrivalTime = flight.outarrivaltime;
 
-        if(departureTime){
-          var t1 = this.convertTimeToHours(departureTime.split(':'));
-          var t2 = this.convertTimeToHours(arrivalTime.split(':'));
-          var timeDelta = t2 - t1;
+      if (departureTime) {
+        var t1 = this.convertTimeToHours(departureTime.split(':'));
+        var t2 = this.convertTimeToHours(arrivalTime.split(':'));
+        var timeDelta = t2 - t1;
 
-          if(timeDelta > maxTime){
-            console.log(timeDelta);
-            maxTime = timeDelta;
-            longestFlight = flights[i]._attributes;
-          }
-
-
+        if (timeDelta > maxTime) {
+          maxTime = timeDelta;
+          longestFlight = flights[i]._attributes;
         }
+      }
     }
 
-    var longestFlightString = longestFlight.carrier + " " + longestFlight.depair + " to " + longestFlight.destair;
+    var longestFlightString = longestFlight.carrier + " " + longestFlight.depair + " to " + longestFlight.destair + " " + maxTime + " Hours long ";
 
     return longestFlightString;
   }
 
-  calculateMostStops(flights){
+  calculateMostStops(flights) {
     var maxStops = 0;
     var mostStopsFlight;
-    for(var i=0; i<flights.length; i++){
-    if(flights[i].segments){//if has segements
-      if(flights[i].segments.segment.length > maxStops){
-        maxStops = flights[i].segments.segment.length;
-        mostStopsFlight = flights[i]._attributes;
+
+    //Loop all flights
+    for (var i = 0; i < flights.length; i++) {
+      if (flights[i].segments) { //if has segements
+
+        //If current flight has more stops than previous max
+        if (flights[i].segments.segment.length > maxStops) {
+          maxStops = flights[i].segments.segment.length;
+          mostStopsFlight = flights[i]._attributes;
         }
       }
     }
 
+    //Generate string
     let flightString = mostStopsFlight.carrier + " " + mostStopsFlight.depair + " to " + mostStopsFlight.destair + " " + maxStops + " stops ";
-    this.setState({mostStopsFlight : flightString })
+
+    this.setState({
+      mostStopsFlight: flightString
+    })
   }
 
-  getAllDeparturesFromAirport(flights,airport){
+  getAllDeparturesFromAirport(flights, airport) {
     var flightsFromAirport = [];
 
-    for(var i=0; i<flights.length; i++){
-      if(flights[i]._attributes.depair == airport){
+    for (var i = 0; i < flights.length; i++) {
+      if (flights[i]._attributes.depair == airport) {
         flightsFromAirport.push(flights[i]);
       }
     }
 
-    console.log(flightsFromAirport);
     return flightsFromAirport;
   }
 
-  mapByDate(flightArray){
-    var hashMap = new Map();// {}
-      for(var i=0; i<flightArray.length; i++){
-        var date = flightArray[i]._attributes.indepartdate;
-        if(hashMap[date] == null){
-          //add one??
-          hashMap[date] = 1;
-        }else{
-          //create new
-          hashMap[date] += 1;
-        }
+  mapByDate(flightArray) {
+    var hashMap = new Map();
+    for (var i = 0; i < flightArray.length; i++) {
+      var date = flightArray[i]._attributes.indepartdate;
+      if (hashMap[date] == null) {
+        hashMap[date] = 1;
+      } else {
+        hashMap[date] += 1;
       }
-      return hashMap;
+    }
+    return hashMap;
   }
 
-  differentFlightNumbersPerDay(flights){
+  differentFlightNumbersPerDay(flights) {
     //change to datesMap
     let datesArray = this.mapByDate(flights);
 
     let hashMap = {};
 
     //FOR EACH DATE
-    for(var i in datesArray){
+    for (var i in datesArray) {
       //GET DATE
       let date = Object.keys(datesArray).find(key => datesArray[key] === datesArray[i]);
       hashMap[date] = 0;
       //Flight numbers for date
       let flightNums = [];
       //LOOP ALL FLIGHTS
-      for(var j=0; j<flights.length; j++){
+      for (var j = 0; j < flights.length; j++) {
         //IF FLIGHTs DATE == date
-        if(flights[j]._attributes.indepartdate == date){
+        if (flights[j]._attributes.indepartdate == date) {
 
-          let flightNumber =  flights[j]._attributes.inflightno;
+          let flightNumber = flights[j]._attributes.inflightno;
           //CHECK IF FLIGHTS NUM IS UNIQUE
-          if(!flightNums.includes(flightNumber)){
+          if (!flightNums.includes(flightNumber)) {
             //add one too date key
             flightNums.push(flightNumber);
             hashMap[date] += 1;
@@ -167,50 +174,45 @@ export default class Flights extends Component {
 
   }
 
-  formatUniqueFlightNumsPerDay(hashMap){
+  formatUniqueFlightNumsPerDay(hashMap) {
 
     let uniqueFlightNumbersPerDayArray = [];
-      for(var i in hashMap){
-
-        if(Object.keys(hashMap).find(key => hashMap[key] === hashMap[i]).length  > 0){
-            uniqueFlightNumbersPerDayArray.push("Date: " + Object.keys(hashMap).find(key => hashMap[key] === hashMap[i]) + " Flight Nums: " +  hashMap[i] + '  ');
-        }
-
+    for (var i in hashMap) {
+      if (Object.keys(hashMap).find(key => hashMap[key] === hashMap[i]).length > 0) {
+        uniqueFlightNumbersPerDayArray.push("Date: " + Object.keys(hashMap).find(key => hashMap[key] === hashMap[i]) + " Flight Nums: " + hashMap[i] + '  ');
       }
+    }
 
-      return uniqueFlightNumbersPerDayArray;
+    return uniqueFlightNumbersPerDayArray;
   }
 
-  calculateProportionOfBusinessClassFlights(flights){
+  calculateProportionOfBusinessClassFlights(flights) {
     //get all flights that have business
     let businessClassFlights = [];
-    for(var i=0; i<flights.length; i++){
-      if(flights[i]._attributes.inflightclass == "Business"){
+    for (var i = 0; i < flights.length; i++) {
+      if (flights[i]._attributes.inflightclass == "Business") {
         businessClassFlights.push(flights[i]);
       }
     }
 
-   let proportion = flights.length / businessClassFlights.length;
+    let proportion = flights.length / businessClassFlights.length;
 
-   return Math.round(proportion);
+    return Math.round(proportion);
   }
 
-  getBusiestDepartureDate(flights){
+  getBusiestDepartureDate(flights) {
     //Find busiest date, return string
     let max = 0;
     let busiestDay = null;
 
-    for (var i in flights){
-      if(flights[i] > max){
+    for (var i in flights) {
+      if (flights[i] > max) {
         max = flights[i]
         busiestDay = flights[i]
-        //console.log(flights[i]);
       }
     }
-      return Object.keys(flights).find(key => flights[key] === max) + " with " + max + " departures";
+    return Object.keys(flights).find(key => flights[key] === max) + " with " + max + " departures";
   }
-
-  //OTHER STAT!
 
   render(){
     var testArray =["Loading"];
