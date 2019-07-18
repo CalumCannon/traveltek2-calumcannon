@@ -10,7 +10,8 @@ export default class Flights extends Component {
       mostStopsFlight : "",
       mostDeparturesFromManchester : "",
       uniqueFlightNumbersPerDay : "",
-      proportionOfBusinessClass : ""
+      proportionOfBusinessClass : "",
+      longestFlight : ""
     }
     this.handleStats = this.handleStats.bind(this);
   }
@@ -44,6 +45,48 @@ export default class Flights extends Component {
     let businessClassProportion = this.calculateProportionOfBusinessClassFlights(flights);
     this.setState({proportionOfBusinessClass : JSON.stringify(businessClassProportion)});
 
+    this.setState({ longestFlight : this.calculateLongestFlight(flights)});
+
+  }
+
+  convertTimeToHours(time){
+    var hours;
+
+    hours = parseFloat(time[0]) + parseFloat((time[1]/60));
+
+
+    return parseFloat(hours).toFixed(2);
+  }
+
+  calculateLongestFlight(flights){
+
+      var maxTime = 0;
+      var longestFlight;
+
+      for(var i=0; i<flights.length; i++){
+        var flight = flights[i]._attributes;
+
+        var departureTime = flight.outdeparttime;
+        var arrivalTime = flight.outarrivaltime;
+
+        if(departureTime){
+          var t1 = this.convertTimeToHours(departureTime.split(':'));
+          var t2 = this.convertTimeToHours(arrivalTime.split(':'));
+          var timeDelta = t2 - t1;
+
+          if(timeDelta > maxTime){
+            console.log(timeDelta);
+            maxTime = timeDelta;
+            longestFlight = flights[i]._attributes;
+          }
+
+
+        }
+    }
+
+    var longestFlightString = longestFlight.carrier + " " + longestFlight.depair + " to " + longestFlight.destair;
+
+    return longestFlightString;
   }
 
   calculateMostStops(flights){
@@ -67,7 +110,6 @@ export default class Flights extends Component {
 
     for(var i=0; i<flights.length; i++){
       if(flights[i]._attributes.depair == airport){
-        console.log("Flight found for ", airport);
         flightsFromAirport.push(flights[i]);
       }
     }
@@ -88,14 +130,13 @@ export default class Flights extends Component {
           hashMap[date] += 1;
         }
       }
-      //console.log(hashMap);
       return hashMap;
   }
 
   differentFlightNumbersPerDay(flights){
     //change to datesMap
     let datesArray = this.mapByDate(flights);
-    console.log("date array", datesArray);
+
     let hashMap = {};
 
     //FOR EACH DATE
@@ -121,9 +162,9 @@ export default class Flights extends Component {
         }
       }
     }
-    //console.log(hashMap);
+
     return this.formatUniqueFlightNumsPerDay(hashMap);
-    //return hashMap;
+
   }
 
   formatUniqueFlightNumsPerDay(hashMap){
@@ -148,9 +189,9 @@ export default class Flights extends Component {
         businessClassFlights.push(flights[i]);
       }
     }
-   //total / businessClassCount = proportion??? check this
+
    let proportion = flights.length / businessClassFlights.length;
-   //console.log(proportion);
+
    return Math.round(proportion);
   }
 
@@ -186,7 +227,7 @@ export default class Flights extends Component {
       <p>Flight with the most stops {this.state.mostStopsFlight} </p>
       <p>Most departures from Manchester on the {this.state.mostDeparturesFromManchester} </p>
       <p>Proportion of business class flights {this.state.proportionOfBusinessClass} </p>
-      <p>INTERESTING STAT </p>
+      <p>Longest flight is {this.state.longestFlight} </p>
       <p> Different flight numbers per day  </p>
         <ul className="list">
           {testArray.map((value, index) => {
