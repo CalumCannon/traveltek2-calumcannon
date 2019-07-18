@@ -130,7 +130,7 @@ export default class Flights extends Component {
   mapByDate(flightArray) {
     var hashMap = new Map();
     for (var i = 0; i < flightArray.length; i++) {
-      var date = flightArray[i]._attributes.indepartdate;
+      var date = flightArray[i]._attributes.outdepartdate;
       if (hashMap[date] == null) {
         hashMap[date] = 1;
       } else {
