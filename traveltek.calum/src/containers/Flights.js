@@ -22,26 +22,6 @@ export default class Flights extends Component {
       this.handleStats()
     }))
 
-    // Request.getFlights()
-    // //.then(flights => this.setState({flightArray : flights}))
-    // .then(flights => this.calculateMostStops(flights))
-    // .then(result => this.setState({mostStopsFlight : result }))
-
-    // Request.getFlights()
-    // .then(flights => this.getAllDeparturesFromAirport(flights, "MAN"))
-    // .then(flightsFromAirport => this.mapByDate(flightsFromAirport))
-    // .then(flightsByDate => this.getBusiestDepartureDate(flightsByDate))
-    // .then(result => this.setState({mostDeparturesFromManchester : result }))
-
-    // Request.getFlights()
-    // .then(flights => this.differentFlightNumbersPerDay(flights))
-    // //.then(result => this.setState({uniqueFlightNumbersPerDay : JSON.stringify(result) }))
-    // .then(result => this.setState({uniqueFlightNumbersPerDay : result }))
-
-    Request.getFlights()
-    .then(flights => this.calculateProportionOfBusinessClassFlights(flights))
-    .then(result => this.setState({proportionOfBusinessClass : JSON.stringify(result) }))
-
   }
 
   handleStats(){
