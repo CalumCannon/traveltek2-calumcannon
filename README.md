@@ -14,3 +14,4 @@ npm start
 
 ## Todo
 Automatically close connection after seeding db...
+Reformat different flights per day 
