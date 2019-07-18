@@ -5,6 +5,7 @@
 # Back End
 From server folder in terminal.. <br/>
 mongod : starts mongodb <br/>
+new terminal window
 node db/converter.js : seeds db, wait a few seconds then use control c to close.. <br/>
 npm run server:dev : starts server <br/>
 
