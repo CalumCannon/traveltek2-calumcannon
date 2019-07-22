@@ -231,10 +231,12 @@ export default class Flights extends Component {
       <p>Most departures from Manchester on the {this.state.mostDeparturesFromManchester} </p>
       <p>Proportion of business class flights {this.state.proportionOfBusinessClass} </p>
       <p>Longest flight is {this.state.longestFlight} </p>
-      <p> Different flight numbers per day  </p>
-      <FlightNumbersGraph dataIn={this.state.uniqueFlightNumbersPerDay}/>
+      <h2> Different flight numbers per day  </h2>
 
-      
+      <div className="graphContainer">
+      <FlightNumbersGraph dataIn={this.state.uniqueFlightNumbersPerDay}/>
+      </div>
+
 
       </div>
     )

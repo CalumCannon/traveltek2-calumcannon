@@ -11,9 +11,9 @@ class FlightNumbersGraph extends Component {
 
   render() {
 		const options = {
-			theme: "light2",
+			theme: "light1",
 			title: {
-				text: "Flight numbers per day"
+
 			},
 			axisY: {
 				title: "Flight Numbers",

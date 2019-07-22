@@ -35,3 +35,8 @@ code {
 h1{
   color: white;
 }
+
+.graphContainer{
+  width: 80%;
+   margin: auto;
+}
