@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import Request from '../helpers/Request';
+import FlightNumbersGraph from '../components/flightNumbersGraph.js'
 
 export default class Flights extends Component {
 
@@ -169,8 +170,8 @@ export default class Flights extends Component {
         }
       }
     }
-
-    return this.formatUniqueFlightNumsPerDay(hashMap);
+    return hashMap;
+    //return this.formatUniqueFlightNumsPerDay(hashMap);
 
   }
 
@@ -231,11 +232,9 @@ export default class Flights extends Component {
       <p>Proportion of business class flights {this.state.proportionOfBusinessClass} </p>
       <p>Longest flight is {this.state.longestFlight} </p>
       <p> Different flight numbers per day  </p>
-        <ul className="list">
-          {testArray.map((value, index) => {
-            return <li key={index}>{value}</li>
-          })}
-        </ul>
+      <FlightNumbersGraph dataIn={this.state.uniqueFlightNumbersPerDay}/>
+
+      
 
       </div>
     )
